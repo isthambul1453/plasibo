@@ -33,6 +33,11 @@ class MessageController extends Controller
 
     public function byGroup(Group $group)
     {
+        // Ensure the authenticated user is a member of the group
+        if (!$group->users()->where('users.id', auth()->id())->exists()) {
+            abort(403, 'You are not a member of this group.');
+        }
+
         $messages = Message::where('group_id', $group->id)
             ->latest()
             ->paginate(10);
@@ -45,6 +50,21 @@ class MessageController extends Controller
 
     public function loadOlder(Message $message)
     {
+        $userId = auth()->id();
+
+        // Verify the user has access to the conversation/group this message belongs to
+        if ($message->group_id) {
+            $group = Group::find($message->group_id);
+            if (!$group || !$group->users()->where('users.id', $userId)->exists()) {
+                abort(403, 'You are not a member of this group.');
+            }
+        } else {
+            // User must be sender or receiver of this DM conversation
+            if ($message->sender_id !== $userId && $message->receiver_id !== $userId) {
+                abort(403, 'You do not have access to this conversation.');
+            }
+        }
+
         // Load older messages that are older than the given message, sort them by the latest
         if ($message->group_id) {
             $messages = Message::where('created_at', '<', $message->created_at)
@@ -99,7 +119,6 @@ class MessageController extends Controller
             }
             $message->attachments = $attachments;
         }
-
 
         if ($receiverId) {
             Conversation::updateConversationWithMessage($receiverId, auth()->id(), $message);
