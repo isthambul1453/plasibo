@@ -15,6 +15,7 @@ class User extends Authenticatable
 
     /**
      * The attributes that are mass assignable.
+     * Note: 'is_admin' intentionally excluded to prevent privilege escalation via mass assignment.
      *
      * @var array<int, string>
      */
@@ -24,7 +25,6 @@ class User extends Authenticatable
         'email',
         'email_verified_at',
         'password',
-        'is_admin'
     ];
 
     /**
@@ -77,7 +77,6 @@ class User extends Authenticatable
             ->orderBy('users.name')
         ;
 
-        // dd($query->toSql());
         return $query->get();
     }
 
