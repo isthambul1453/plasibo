@@ -14,20 +14,27 @@ class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
+     *
+     * Passwords are read from environment variables so that hardcoded
+     * credentials are never committed to source control or used in production.
+     * Set SEED_ADMIN_PASSWORD and SEED_USER_PASSWORD in your .env (dev only).
      */
     public function run(): void
     {
+        $adminPassword = env('SEED_ADMIN_PASSWORD', \Illuminate\Support\Str::random(16));
+        $userPassword  = env('SEED_USER_PASSWORD',  \Illuminate\Support\Str::random(16));
 
         User::factory()->create([
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'password' => bcrypt('password'),
-            'is_admin' => true
+            'name'     => 'John Doe',
+            'email'    => 'john@example.com',
+            'password' => bcrypt($adminPassword),
+            'is_admin' => true,
         ]);
+
         User::factory()->create([
-            'name' => 'Jane Doe',
-            'email' => 'jane@example.com',
-            'password' => bcrypt('password'),
+            'name'     => 'Jane Doe',
+            'email'    => 'jane@example.com',
+            'password' => bcrypt($userPassword),
         ]);
 
         User::factory(10)->create();
@@ -48,11 +55,11 @@ class DatabaseSeeder extends Seeder
             return collect([$message->sender_id, $message->receiver_id])->sort()->implode('_');
         })->map(function ($groupedMessages) {
             return [
-                'user_id1' => $groupedMessages->first()->sender_id,
-                'user_id2' => $groupedMessages->first()->receiver_id,
+                'user_id1'        => $groupedMessages->first()->sender_id,
+                'user_id2'        => $groupedMessages->first()->receiver_id,
                 'last_message_id' => $groupedMessages->last()->id,
-                'created_at' => new Carbon(),
-                'updated_at' => new Carbon(),
+                'created_at'      => new Carbon(),
+                'updated_at'      => new Carbon(),
             ];
         })->values();
 

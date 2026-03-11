@@ -23,9 +23,10 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'message'     => 'nullable|string',
-            'group_id'    => 'required_without:receiver_id|nullable|exists:groups,id',
-            'receiver_id' => 'required_without:group_id|nullable|exists:users,id',
+            // max:60000 prevents oversized payloads / DB DoS via longText column
+            'message'       => 'nullable|string|max:60000',
+            'group_id'      => 'required_without:receiver_id|nullable|exists:groups,id',
+            'receiver_id'   => 'required_without:group_id|nullable|exists:users,id',
             'attachments'   => 'nullable|array|max:10',
             // Restrict allowed MIME types to prevent remote code execution
             'attachments.*' => 'file|max:1024000|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,txt,zip,mp4,mp3',
