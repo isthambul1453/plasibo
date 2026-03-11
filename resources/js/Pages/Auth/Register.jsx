@@ -12,6 +12,7 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
+        phone: '',
     });
 
     useEffect(() => {
@@ -22,7 +23,6 @@ export default function Register() {
 
     const submit = (e) => {
         e.preventDefault();
-
         post(route('register'));
     };
 
@@ -33,7 +33,6 @@ export default function Register() {
             <form onSubmit={submit}>
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
-
                     <TextInput
                         id="name"
                         name="name"
@@ -44,13 +43,11 @@ export default function Register() {
                         onChange={(e) => setData('name', e.target.value)}
                         required
                     />
-
                     <InputError message={errors.name} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="email" value="Email" />
-
                     <TextInput
                         id="email"
                         type="email"
@@ -61,13 +58,29 @@ export default function Register() {
                         onChange={(e) => setData('email', e.target.value)}
                         required
                     />
-
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="phone" value="Phone Number" />
+                    <TextInput
+                        id="phone"
+                        type="tel"
+                        name="phone"
+                        value={data.phone}
+                        className="mt-1 block w-full"
+                        autoComplete="tel"
+                        placeholder="+905xxxxxxxxx"
+                        onChange={(e) => setData('phone', e.target.value)}
+                    />
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        Opsiyonel. Kimlik dogrulama aramasi icin kullanilir. Ulke kodu ile girin (+90...)
+                    </p>
+                    <InputError message={errors.phone} className="mt-2" />
+                </div>
 
+                <div className="mt-4">
+                    <InputLabel htmlFor="password" value="Password" />
                     <TextInput
                         id="password"
                         type="password"
@@ -78,13 +91,11 @@ export default function Register() {
                         onChange={(e) => setData('password', e.target.value)}
                         required
                     />
-
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-
                     <TextInput
                         id="password_confirmation"
                         type="password"
@@ -95,7 +106,6 @@ export default function Register() {
                         onChange={(e) => setData('password_confirmation', e.target.value)}
                         required
                     />
-
                     <InputError message={errors.password_confirmation} className="mt-2" />
                 </div>
 
@@ -106,7 +116,6 @@ export default function Register() {
                     >
                         Already registered?
                     </Link>
-
                     <PrimaryButton className="ms-4" disabled={processing}>
                         Register
                     </PrimaryButton>
