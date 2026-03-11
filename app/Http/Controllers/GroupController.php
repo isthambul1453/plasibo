@@ -28,6 +28,11 @@ class GroupController extends Controller
      */
     public function update(UpdateGroupRequest $request, Group $group)
     {
+        // Only the group owner can update the group
+        if ($group->owner_id !== auth()->id()) {
+            abort(403, 'Only the group owner can update this group.');
+        }
+
         $data = $request->validated();
         $user_ids = $data['user_ids'] ?? [];
         $group->update($data);
@@ -44,7 +49,7 @@ class GroupController extends Controller
      */
     public function destroy(Group $group)
     {
-        // Check if the user is onwer of the group
+        // Check if the user is owner of the group
         if ($group->owner_id !== auth()->id()) {
             abort(403);
         }

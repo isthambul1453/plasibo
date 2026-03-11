@@ -26,7 +26,8 @@ class StoreMessageRequest extends FormRequest
             'group_id' => 'required_without:receiver_id|nullable|exists:groups,id',
             'receiver_id' => 'required_without:group_id|nullable|exists:users,id',
             'attachments' => 'nullable|array|max:10',
-            'attachments.*' => 'file|max:1024000',
+            // Restrict allowed MIME types to prevent remote code execution
+            'attachments.*' => 'file|max:1024000|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,txt,zip,mp4,mp3',
         ];
     }
 }

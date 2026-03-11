@@ -14,17 +14,23 @@ class UserController extends Controller
 {
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string',
             'email' => ['required', 'email', 'unique:users,email'],
-            'is_admin' => 'boolean',
+            // is_admin is intentionally NOT validated from request input to prevent privilege escalation.
+            // Admin status is set explicitly below.
         ]);
+
         // Generate and assign a random password
         $rawPassword = Str::random(8);
-        $data['password'] = bcrypt($rawPassword);
-        $data['email_verified_at'] = now();
 
-        $user = User::create($data);
+        $user = User::create([
+            'name'              => $validated['name'],
+            'email'             => $validated['email'],
+            'password'          => bcrypt($rawPassword),
+            'email_verified_at' => now(),
+            'is_admin'          => false, // Never allow user-supplied is_admin value
+        ]);
 
         Mail::to($user)->send(new UserCreated($user, $rawPassword));
 
