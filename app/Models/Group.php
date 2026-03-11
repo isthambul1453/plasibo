@@ -68,10 +68,15 @@ class Group extends Model
 
     public static function updateGroupWithMessage($groupId, $message)
     {
-        // Create or update group with received group id and message
-        return self::updateOrCreate(
-            ['id' => $groupId], // search conditions
-            ['last_message_id' => $message->id] // values to update
-        );
+        // Use update() instead of updateOrCreate() to prevent creation of arbitrary group records
+        // from user-supplied group_id values.
+        $updated = self::where('id', $groupId)->update(['last_message_id' => $message->id]);
+
+        if (!$updated) {
+            // Group not found; this should not happen under normal flow
+            throw new \RuntimeException("Group [{$groupId}] not found when updating last message.");
+        }
+
+        return $updated;
     }
 }

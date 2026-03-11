@@ -17,3 +17,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+# Vite runtime files
+vite.log
+vite.err.log
+vite.pid

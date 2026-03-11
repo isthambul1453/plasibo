@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Events\GroupDeleted;
 use App\Models\Group;
+use App\Models\Message;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -33,8 +34,12 @@ class DeleteGroupJob implements ShouldQueue
         $this->group->last_message_id = null;
         $this->group->save();
 
-        // Iterate over all messages and delete them
-        $this->group->messages->each->delete();
+        // Delete messages in chunks to avoid loading all records into memory at once (OOM prevention)
+        Message::where('group_id', $id)->chunkById(100, function ($messages) {
+            foreach ($messages as $message) {
+                $message->delete();
+            }
+        });
 
         // Remove all users from the group
         $this->group->users()->detach();
